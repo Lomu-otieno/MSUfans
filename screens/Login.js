@@ -1,82 +1,88 @@
 import { StatusBar } from 'expo-status-bar';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
 import { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, ImageBackground, Alert, TouchableOpacity } from 'react-native'
+import { View, Text, Button, TextInput, StyleSheet, ImageBackground, Alert, TouchableOpacity } from 'react-native';
 import { auth } from '../config/firebase';
 
-const image = { uri: ('https://i.pinimg.com/736x/af/e1/1b/afe11bd360cf7366be1d4bc7bc79b375.jpg') }
-//https://cdni.pornpics.com/460/7/254/30902988/30902988_038_aab8.jpg
-const SignupScreen = ({ navigation }) => {
-    const [username, onchangeUsername] = React.useState('');
+const image = { uri: ('https://i.pinimg.com/474x/8e/2e/0c/8e2e0c7e8c45a06aacb1bfffefbcfcaa.jpg') }
+//https://i.pinimg.com/736x/af/e1/1b/afe11bd360cf7366be1d4bc7bc79b375.jpg
+
+const LoginScreen = ({ navigation }) => {
     const [email, onchangeEmail] = React.useState('');
     const [password, onchangepassword] = React.useState('');
-    const [confirm, onchangeconfirm] = React.useState('');
     const [focusedInput, setFocusedInput] = useState(null);
 
     const handleSubmit = async () => {
         if (email && password) {
             try {
-                await createUserWithEmailAndPassword(auth, email, password);
+                await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
                 console.log('got error', error.message);
             }
         }
+    }
+
+    const hello = () => {
+        return Alert.alert("Hello");
     }
     return (
         <>
             <StatusBar style='dark'></StatusBar>
             <ImageBackground source={image} resizeMode='cover' style={styles.backgroundImage}>
                 <View style={styles.container}>
-                    <Text style={styles.header}>Sign Up</Text>
+                    <Text style={styles.header}>Login</Text>
                     <View style={styles.subcontainer}>
-                        <View style={{ padding: 10, borderRadius: 10 }}>
+                        <View>
                             <View>
-                                <Text style={styles.text}>Username</Text>
+                                <Text style={styles.text}>Enter email</Text>
                                 <TextInput style={[styles.input, { color: focusedInput === 'input1' ? 'yellow' : '#000' }]}
-                                    value={username}
-                                    placeholder='enter your username'
-                                    placeholderTextColor={focusedInput === 'input1' ? '#999' : '#fff'}
-                                    onChangeText={value => onchangeUsername(value)}
+                                    value={email}
+                                    placeholder='example@gmail.com'
+                                    onChangeText={value => onchangeEmail(value)}
                                     onFocus={() => setFocusedInput('input1')}
                                     onBlur={() => setFocusedInput(null)}
                                 >
                                 </TextInput>
                             </View>
                             <View>
-                                <Text style={styles.text}>Enter email</Text>
+                                <Text style={styles.text}>Enter Password</Text>
                                 <TextInput style={[styles.input, { color: focusedInput === 'input2' ? 'yellow' : '#000' }]}
-                                    value={email}
-                                    placeholder='example@gmail.com'
-                                    placeholderTextColor={focusedInput === 'input2' ? '#999' : '#fff'}
-                                    onChangeText={value => onchangeEmail(value)}
+                                    value={password}
+                                    placeholder='********'
+                                    onChangeText={value => onchangepassword(value)}
+                                    secureTextEntry
+                                    autoCorrect={false}
                                     onFocus={() => setFocusedInput('input2')}
                                     onBlur={() => setFocusedInput(null)}
                                 >
                                 </TextInput>
                             </View>
-                            <View>
-                                <Text style={styles.text}>Set Password</Text>
-                                <TextInput style={[styles.input, { color: focusedInput === 'input3' ? 'yellow' : '#000' }]}
-                                    value={password}
-                                    placeholder='********'
-                                    placeholderTextColor={focusedInput === 'input3' ? '#999' : '#fff'}
-                                    onChangeText={value => onchangepassword(value)}
-                                    secureTextEntry
-                                    autoCorrect={false}
-                                    onFocus={() => setFocusedInput('input3')}
-                                    onBlur={() => setFocusedInput(null)}
-                                >
-                                </TextInput>
-                            </View>
                         </View>
+                        <TouchableOpacity onPress={() => { }}>
+                            <View style={{
+                                marginTop: 10,
+                                alignItems: 'center',
+                                justifyContent: 'center',
+
+
+                            }}
+                            >
+                                <Text style={{
+                                    fontSize: 15,
+                                    fontWeight: '200',
+                                    color: "#fff",
+                                }}>forgot password? <Text style={{ color: "darkblue", fontSize: 18 }}>Reset</Text></Text>
+                            </View>
+                        </TouchableOpacity>
                     </View>
+
                     <TouchableOpacity onPress={handleSubmit}>
                         <View style={{
                             alignItems: 'center',
                             justifyContent: 'center',
                             width: 200,
-                            backgroundColor: "green",
+                            backgroundColor: "blue",
                             borderRadius: 10,
 
 
@@ -86,10 +92,10 @@ const SignupScreen = ({ navigation }) => {
                                 fontSize: 25,
                                 fontWeight: '400',
                                 color: "#fff",
-                            }}>Signup</Text>
+                            }}>Login</Text>
                         </View>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                    <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
                         <View style={{
                             marginTop: 10,
                             alignItems: 'center',
@@ -102,7 +108,7 @@ const SignupScreen = ({ navigation }) => {
                                 fontSize: 18,
                                 fontWeight: '200',
                                 color: "#fff",
-                            }}>Already have a account? <Text style={{ color: "darkblue", fontSize: 22 }}>Login</Text> </Text>
+                            }}>Don't have account? <Text style={{ color: "darkblue", fontSize: 22 }}>Signup</Text></Text>
                         </View>
                     </TouchableOpacity>
                 </View>
@@ -112,7 +118,7 @@ const SignupScreen = ({ navigation }) => {
     );
 }
 
-export default SignupScreen;
+export default LoginScreen;
 
 const styles = StyleSheet.create({
     backgroundImage: {
@@ -143,11 +149,10 @@ const styles = StyleSheet.create({
         padding: 10,
         borderRadius: 5,
         marginBottom: 25,
-        borderColor: "grey ",
-        backgroundColor: "grey"
+        borderColor: "white"
     },
     text: {
-        color: "#3D7A57",
+        color: "white",
         fontSize: 18,
     },
     subcontainer: {

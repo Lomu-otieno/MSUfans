@@ -12,6 +12,16 @@ export default function Home() {
     //https://i.pinimg.com/736x/19/9a/06/199a06f51bcef14e8d0357912fa53f5b.jpg
     //https://i.pinimg.com/236x/ed/20/5a/ed205aff1fb33c28ddd8bfc7f3e7ff29.jpg
     //https://i.pinimg.com/236x/50/a7/03/50a7038452b9def243975fd9c51fea1d.jpg
+
+    const changePassword = () => {
+        firebase.auth().sendPasswordResetEmail(firebase.auth().currentUser.email)
+            .then(() => {
+                alert('Passwoed reset email sent')
+            }).catch((error) => {
+                alert(error)
+            })
+    }
+
     return (
         <ImageBackground source={image} resizeMode='cover' style={styles.backgroundImage}>
             <View style={styles.container}>
@@ -24,6 +34,18 @@ export default function Home() {
                             style={styles.button}
                         >
                             Logout
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+                <View></View>
+                <View style={styles.button_container}>
+                    <TouchableOpacity
+                        onPress={changePassword}
+                    >
+                        <Text
+                            style={styles.button}
+                        >
+                            Change Password
                         </Text>
                     </TouchableOpacity>
                 </View>

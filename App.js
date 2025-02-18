@@ -3,6 +3,7 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import SignupScreen from "./screens/Signup";
 import LoginScreen from "./screens/Login";
+import ForgotPassScreen from "./screens/forgotPassScreen";
 import Home from './screens/Home';
 import useAuth from "./hook/useAuth";
 
@@ -29,6 +30,7 @@ export default function App() {
         screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="ForgotPassScreen" component={ForgotPassScreen} />
       </Stack.Navigator>
     </NavigationContainer >
   );

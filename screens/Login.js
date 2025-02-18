@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import React from 'react';
 import { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, ImageBackground, Alert, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, StyleSheet, ImageBackground, Alert, TouchableOpacity } from 'react-native';
 import { auth } from '../config/firebase';
 
 const image = { uri: ('https://i.pinimg.com/474x/8e/2e/0c/8e2e0c7e8c45a06aacb1bfffefbcfcaa.jpg') }
@@ -23,8 +23,15 @@ const LoginScreen = ({ navigation }) => {
         }
     }
 
-    const hello = () => {
-        return Alert.alert("Hello");
+    const forgetPassword = () => {
+        sendPasswordResetEmail(auth, email)
+            .then(() => {
+                Alert.alert('Passowrd Reset Link is sent Successfully')
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+            });
     }
     return (
         <>
@@ -59,7 +66,7 @@ const LoginScreen = ({ navigation }) => {
                                 </TextInput>
                             </View>
                         </View>
-                        <TouchableOpacity onPress={() => { }}>
+                        <TouchableOpacity onPress={() => navigation.navigate('ForgotPassScreen')}>
                             <View style={{
                                 marginTop: 10,
                                 alignItems: 'center',

@@ -12,14 +12,17 @@ const LoginScreen = ({ navigation }) => {
     const [email, onchangeEmail] = React.useState('');
     const [password, onchangepassword] = React.useState('');
     const [focusedInput, setFocusedInput] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
 
     const handleSubmit = async () => {
         if (email && password) {
             try {
                 await signInWithEmailAndPassword(auth, email, password);
             } catch (error) {
-                console.log('got error', error.message);
+                setErrorMessage('Invalid shit are you dumb!');
             }
+        } else {
+            setErrorMessage('Your ass should input some shit')
         }
     }
 
@@ -65,6 +68,9 @@ const LoginScreen = ({ navigation }) => {
                                 >
                                 </TextInput>
                             </View>
+                            {errorMessage ? (
+                                <Text style={styles.errorText}>{errorMessage}</Text>
+                            ) : null}
                         </View>
                         <TouchableOpacity onPress={() => navigation.navigate('ForgotPassScreen')}>
                             <View style={{
@@ -172,4 +178,12 @@ const styles = StyleSheet.create({
         borderRadius: 40,
 
     },
+    errorText: {
+        color: 'red',
+        fontSize: 18,
+        textAlign: 'center',
+        marginBottom: 5,
+        backgroundColor: "white",
+        borderRadius: 5
+    }
 });

@@ -19,7 +19,8 @@ const ForgotPassScreen = ({ navigation }) => {
         }
         sendPasswordResetEmail(auth, email)
             .then(() => {
-                setErrorMessage("Password Reset Link is sent Successfully!")
+                setErrorMessage("Reset link is sent Successfully!");
+                navigation.goBack();
             })
             .catch((error) => {
                 setErrorMessage(error.message);

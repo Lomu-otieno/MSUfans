@@ -8,10 +8,11 @@ import { useEffect, useState } from 'react'
 
 export default function userAuth() {
     const [user, setUser] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('');
 
     useEffect(() => {
         const unsub = onAuthStateChanged(auth, user => {
-            console.log('got user', user);
+            setErrorMessage('User added successfully!');
             if (user) {
                 setUser(user);
             } else {

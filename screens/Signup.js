@@ -2,8 +2,9 @@ import { StatusBar } from 'expo-status-bar';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import React from 'react';
 import { useState } from 'react';
-import { View, Text, Button, TextInput, StyleSheet, ImageBackground, Alert, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, StyleSheet, ImageBackground, Alert, TouchableOpacity } from 'react-native'
 import { auth } from '../config/firebase';
+import { updateProfile } from 'firebase/auth';
 
 const image = { uri: ('https://i.pinimg.com/736x/af/e1/1b/afe11bd360cf7366be1d4bc7bc79b375.jpg') }
 //https://cdni.pornpics.com/460/7/254/30902988/30902988_038_aab8.jpg
@@ -13,16 +14,27 @@ const SignupScreen = ({ navigation }) => {
     const [password, onchangepassword] = React.useState('');
     const [confirm, onchangeconfirm] = React.useState('');
     const [focusedInput, setFocusedInput] = useState(null);
+    const [errorMessage, setErrorMessage] = useState('')
+
 
     const handleSubmit = async () => {
-        if (email && password) {
+        if (email && password && username) {
             try {
-                await createUserWithEmailAndPassword(auth, email, password);
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                // Update Firebase Auth profile with the username
+                await updateProfile(user, { displayName: username });
+
+                Alert.alert("Success", "Account created.");
+                navigation.goBack();
             } catch (error) {
-                console.log('got error', error.message);
+                setErrorMessage("Check your internet connection and try again");
             }
+        } else {
+            setErrorMessage("Please enter all required fields");
         }
-    }
+    };
     return (
         <>
             <StatusBar style='dark'></StatusBar>
@@ -69,6 +81,9 @@ const SignupScreen = ({ navigation }) => {
                                 >
                                 </TextInput>
                             </View>
+                            {errorMessage ? (
+                                <Text style={{ backgroundColor: "#fff", color: "red", fontSize: 18, borderRadius: 5 }}>{errorMessage}</Text>
+                            ) : null}
                         </View>
                     </View>
                     <TouchableOpacity onPress={handleSubmit}>

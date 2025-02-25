@@ -41,7 +41,7 @@ const LoginScreen = ({ navigation }) => {
             <StatusBar style='dark'></StatusBar>
             <ImageBackground source={image} resizeMode='cover' style={styles.backgroundImage}>
                 <View style={styles.container}>
-                    <Text style={styles.header}>Login</Text>
+                    <Text style={styles.header}>Welcome back!</Text>
                     <View style={styles.subcontainer}>
                         <View>
                             <View>
@@ -146,9 +146,9 @@ const styles = StyleSheet.create({
     },
     header: {
         marginBottom: 40,
-        color: "#2f3061",
+        color: "#fff",
         width: "80%",
-        backgroundColor: "#758173",
+        backgroundColor: "#000",
         height: 40,
         textAlign: 'center',
         fontSize: 25,

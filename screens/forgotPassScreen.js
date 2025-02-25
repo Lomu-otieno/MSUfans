@@ -6,6 +6,10 @@ import { auth } from '../config/firebase'; // Use auth from firebase config
 
 const image = { uri: ('https://i.pinimg.com/736x/19/9a/06/199a06f51bcef14e8d0357912fa53f5b.jpg') }
 
+const goBack = () => {
+    navigation.navigate("Login");
+}
+
 const ForgotPassScreen = ({ navigation }) => {
     const [email, onchangeEmail] = useState('');
     const [focusedInput, setFocusedInput] = useState(null);
@@ -23,7 +27,7 @@ const ForgotPassScreen = ({ navigation }) => {
                 navigation.goBack();
             })
             .catch((error) => {
-                setErrorMessage(error.message);
+                setErrorMessage("Check your internet connection and try again");
             });
     };
 
@@ -55,6 +59,11 @@ const ForgotPassScreen = ({ navigation }) => {
 
                     <TouchableOpacity onPress={handleResetPassword} style={styles.button}>
                         <Text style={styles.buttonText}>Reset Password</Text>
+                    </TouchableOpacity>
+
+
+                    <TouchableOpacity onPress={goBack} style={{ padding: 10, marginTop: 5 }}>
+                        <Text style={{ color: "#000", fontSize: 20, fontWeight: "bold" }}>Log in</Text>
                     </TouchableOpacity>
                 </View>
             </ImageBackground>

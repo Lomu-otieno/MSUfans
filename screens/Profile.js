@@ -1,27 +1,44 @@
 import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Image } from 'react-native';
 import React, { useState, useEffect } from 'react';
 import { signOut, sendPasswordResetEmail, onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../config/firebase';
+import { auth, db } from '../config/firebase'; // Import Firestore
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from '@react-navigation/native';
-
-
+import { doc, getDoc } from "firebase/firestore"; // Import Firestore methods
 
 export default function Home() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
+    const [gender, setGender] = useState('');
+    const [interests, setInterests] = useState('');
+    const [contact, setContact] = useState('');
+    const [profilePicture, setProfilePicture] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const navigation = useNavigation();
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
             if (user) {
-                setUsername(user.displayName || "No Username"); // Fetch display name or set default
+                setUsername(user.displayName || "No Username");
                 setEmail(user.email || "No Email");
+
+                // Fetch additional user details from Firestore
+                const userDocRef = doc(db, "users", user.uid); // Assuming "users" collection
+                const userDocSnap = await getDoc(userDocRef);
+
+                if (userDocSnap.exists()) {
+                    const userData = userDocSnap.data();
+                    setGender(userData.gender || "Not specified");
+                    setInterests(userData.interests || "No interests");
+                    setContact(userData.contact || "No contact info");
+                    setProfilePicture(userData.profilePicture || "https://via.placeholder.com/150");
+                } else {
+                    console.log("No user data found in Firestore");
+                }
             }
         });
 
-        return unsubscribe; // Cleanup on unmount
+        return unsubscribe;
     }, []);
 
     const handleLogout = async () => {
@@ -31,12 +48,8 @@ export default function Home() {
     const changePassword = () => {
         if (auth.currentUser) {
             sendPasswordResetEmail(auth, auth.currentUser.email)
-                .then(() => {
-                    setErrorMessage('Password reset email sent.');
-                })
-                .catch(() => {
-                    setErrorMessage("Too many Requests, try again later");
-                });
+                .then(() => setErrorMessage('Password reset email sent.'))
+                .catch(() => setErrorMessage("Too many requests, try again later"));
         } else {
             setErrorMessage('No user is logged in.');
         }
@@ -51,8 +64,7 @@ export default function Home() {
                 {/* Profile Section */}
                 <View style={styles.profileContainer}>
                     <View style={styles.profileWrapper}>
-                        <Image source={{ uri: 'https://i.pinimg.com/236x/67/ae/00/67ae003d6499d0acf7d0f90c997a2472.jpg' }}
-                            style={styles.profileImage} />
+                        <Image source={{ uri: profilePicture }} style={styles.profileImage} />
                         <TouchableOpacity style={styles.cameraButton}>
                             <Ionicons name="camera-outline" size={30} color={"#fff"} />
                         </TouchableOpacity>
@@ -66,13 +78,14 @@ export default function Home() {
                         <Text style={styles.bioTitle}>User Bio</Text>
                     </View>
                     <Text style={styles.bioText}><Text style={styles.label}>Email:</Text> {email}</Text>
-                    <Text style={styles.bioText}><Text style={styles.label}>Gender:</Text> Male</Text>
-                    <Text style={styles.bioText}><Text style={styles.label}>Interest:</Text> Music, Poetry</Text>
-                    <Text style={styles.bioText}><Text style={styles.label}>Contact:</Text> +123 456 789</Text>
+                    <Text style={styles.bioText}><Text style={styles.label}>Gender:</Text> {gender}</Text>
+                    <Text style={styles.bioText}><Text style={styles.label}>Interest:</Text> {interests}</Text>
+                    <Text style={styles.bioText}><Text style={styles.label}>Contact:</Text> {contact}</Text>
                 </View>
-                <View>
+
+                <View style={styles.updateView}>
                     <TouchableOpacity onPress={() => { navigation.navigate('UpdateProfile') }}>
-                        <Text>Update Profile</Text>
+                        <Text style={styles.update}>Update Bio</Text>
                     </TouchableOpacity>
                 </View>
 
@@ -98,108 +111,132 @@ export default function Home() {
 const styles = StyleSheet.create({
     backgroundImage: {
         flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     overlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0, 0, 0, 0.5)", // Dark overlay for better contrast
+        backgroundColor: 'rgba(0, 0, 0, 0.6)', // Dark overlay for better contrast
     },
     container: {
-        alignItems: 'center',
-        padding: 20,
         width: '90%',
-        backgroundColor: 'rgba(255, 255, 255, 0.15)',
-        borderRadius: 10,
+        backgroundColor: 'rgba(255, 255, 255, 0.15)', // Glassmorphism effect
+        borderRadius: 20,
+        padding: 25,
+        alignItems: 'center',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.3,
+        shadowRadius: 20,
+        backdropFilter: 'blur(10px)', // Blurred glass effect
     },
-
-    /* Profile Section */
     profileContainer: {
         alignItems: 'center',
         marginBottom: 20,
     },
     profileWrapper: {
-        position: "relative",
+        position: 'relative',
+        borderRadius: 100,
     },
     profileImage: {
-        width: 150,
-        height: 150,
-        borderRadius: 75,
-        borderWidth: 3,
-        borderColor: "#ff3d3d",
+        width: 120,
+        height: 120,
+        borderRadius: 60,
+        borderWidth: 2,
+        borderColor: '#fff',
+
     },
     cameraButton: {
-        position: "absolute",
+        position: 'absolute',
         bottom: 5,
         right: 5,
-        backgroundColor: "#000",
-        padding: 8,
+        backgroundColor: '#ff6b6b',
         borderRadius: 20,
+        padding: 6,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.3,
+        shadowRadius: 5,
     },
     username: {
-        fontSize: 22,
-        fontWeight: "bold",
-        color: "#fff",
+        fontSize: 24,
+        fontWeight: 'bold',
         marginTop: 10,
+        color: '#fff',
+        textShadowColor: 'rgba(0, 0, 0, 0.5)',
+        textShadowOffset: { width: 1, height: 1 },
+        textShadowRadius: 5,
     },
-
-    /* Bio Section */
     bioContainer: {
-        backgroundColor: "rgba(255, 255, 255, 0.2)",
-        padding: 15,
-        borderRadius: 8,
-        width: "100%",
-        marginBottom: 15,
+        width: '100%',
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        padding: 20,
+        borderRadius: 15,
+        marginBottom: 20,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 5 },
+        shadowOpacity: 0.15,
+        shadowRadius: 10,
     },
     bioTitle: {
         fontSize: 20,
-        fontWeight: "bold",
-        color: "black",
-        borderRadius: 5,
-        marginBottom: 15,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: '#000',
+        textAlign: 'center',
     },
     bioText: {
         fontSize: 16,
-        color: "#fff",
-        marginBottom: 3,
+        marginBottom: 8,
+        color: '#fff',
+        textAlign: 'center',
     },
     label: {
-        fontWeight: "bold",
-        color: "#000",
+        fontWeight: 'bold',
+        color: '#ffcc00',
     },
-
-    /* Buttons */
     buttonWrapper: {
-        width: "100%",
-        marginTop: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        width: '100%',
+    },
+    updateView: {
+        width: "50%",
+        backgroundColor: "blue",
+        justifyContent: "center",
+        alignItems: "center",
+        borderRadius: 10
+    },
+    update: {
+        color: "#fff",
+        fontSize: 20
     },
     button: {
-        width: '100%',
-        backgroundColor: 'blue',
-        padding: 12,
-        justifyContent: 'center',
+        flex: 1,
+        marginTop: 25,
+        backgroundColor: '#4a90e2',
+        paddingVertical: 12,
+        borderRadius: 30,
         alignItems: 'center',
-        borderRadius: 8,
-        marginVertical: 5,
+        marginHorizontal: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+    },
+    changePassword: {
+        backgroundColor: '#ff6b6b',
     },
     buttonText: {
         color: '#fff',
         fontSize: 18,
-        fontWeight: "bold",
+        fontWeight: 'bold',
     },
-    changePassword: {
-        backgroundColor: 'darkred',
-    },
-
-    /* Error Message */
     errorText: {
-        color: 'red',
-        fontSize: 16,
-        textAlign: 'center',
+        color: '#ff6b6b',
         marginTop: 10,
-        backgroundColor: "white",
-        borderRadius: 5,
-        padding: 8,
-        fontWeight: "bold",
-    }
+        textAlign: 'center',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
